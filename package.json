@@ -13,13 +13,8 @@
     "smoke:func": "node scripts/smoke-functionality.mjs",
     "smoke:improvements": "node scripts/smoke-improvements.mjs",
     "smoke:install": "node scripts/smoke-install-views.mjs",
-    "smoke:live": "node scripts/smoke-live-session.mjs",
-    "smoke:live-client": "node scripts/smoke-live-client.mjs",
-    "smoke:live-e2e": "node scripts/smoke-live-e2e.mjs",
-    "smoke:live-ws": "node scripts/smoke-live-ws.mjs",
-    "smoke:live-ops": "node scripts/smoke-live-studio-ops.mjs",
-    "smoke:live-adversarial": "node scripts/smoke-live-adversarial.mjs",
-    "fuse:matrix": "vite-node scripts/fuse-matrix.ts"
+    "fuse:matrix": "vite-node scripts/fuse-matrix.ts",
+    "smoke:solo": "node scripts/smoke-single-user.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
