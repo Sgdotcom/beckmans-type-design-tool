@@ -130,7 +130,7 @@ export default function App() {
   })
   const restored = recovery.session
   const [prefs] = useState(readUiPrefs)
-  const [showIntro, setShowIntro] = useState(!restored)
+  const [showIntro, setShowIntro] = useState(true)
   const [screen, setScreen] = useState<Screen>('paint')
   const [optionsOpen, setOptionsOpen] = useState(false)
   const [library] = useState<ShapeDef[]>(() => reconcileLibrary(restored?.library))
@@ -1052,18 +1052,16 @@ export default function App() {
       <div className="phone-shell relative flex w-full max-w-[430px] flex-col overflow-hidden lg:max-w-[1400px]">
         {showIntro ? (
           <IntroScreen
-            onStart={() => {
+            onStart={(page: Screen) => {
               setShowIntro(false)
-              setScreen('paint')
+              setScreen(page)
             }}
           />
         ) : (
           <>
         <header className="safe-pt relative z-50 flex shrink-0 items-center justify-between gap-2 border-b border-ink/10 px-3 pb-2 pt-2 lg:px-5 lg:pb-3 lg:pt-3">
           <div className="min-w-0">
-            <p className="specimen-rule mb-0.5">
-              Beckmans Type Design Tool
-            </p>
+            <button type="button" className="specimen-rule mb-0.5 text-left" aria-label="Home" onClick={() => setShowIntro(true)}>Beckmans Type Design Tool</button>
             <h1 className="truncate font-sans text-[1.35rem] font-bold leading-none text-ink">
               {TABS.find((t) => t.id === screen)?.label}
             </h1>
@@ -2124,72 +2122,15 @@ export default function App() {
   )
 }
 
-function IntroScreen({ onStart }: { onStart: () => void }) {
-  return (
-    <div
-      className="relative flex h-full min-h-0 flex-col overflow-hidden bg-paper"
-      data-testid="intro-screen"
-    >
-      <div className="safe-pt relative mx-auto flex min-h-0 flex-1 flex-col px-5 pb-4 pt-8 lg:max-w-2xl lg:justify-center lg:px-10 lg:pt-16">
-        <p className="specimen-rule rise">
-          Beckmans Type Design Tool
-        </p>
-        <h1 className="rise rise-1 mt-5 font-sans text-[2.1rem] font-bold leading-[1.05] text-ink lg:text-4xl">
-          Make your letters.
-          <br />
-          Soften. Download SVG.
-        </h1>
-        <p className="rise rise-2 mt-4 max-w-[20rem] text-sm leading-relaxed text-ink-muted lg:max-w-lg lg:text-base">
-          Pick a brush, stamp a grid, fuse joins — keep going through the alphabet, then
-          download the set.
-        </p>
-        <ol className="rise rise-3 mt-8 space-y-4 text-sm leading-snug text-ink">
-          <li className="flex gap-3">
-            <span className="w-7 shrink-0 font-sans text-lg text-sea">01</span>
-            <span>
-              <strong className="font-semibold">Shape</strong> — pick a brush and see the grid
-              preview.
-            </span>
-          </li>
-          <li className="flex gap-3">
-            <span className="w-7 shrink-0 font-sans text-lg text-sea">02</span>
-            <span>
-              <strong className="font-semibold">Paint</strong> — stamp cells; Softness fuses
-              close shapes (higher = farther). Break join splits a fuse.
-            </span>
-          </li>
-          <li className="flex gap-3">
-            <span className="w-7 shrink-0 font-sans text-lg text-sea">03</span>
-            <span>
-              <strong className="font-semibold">Export</strong> — preview this letter, or
-              download all painted letters together.
-            </span>
-          </li>
-          <li className="flex gap-3">
-            <span className="w-7 shrink-0 font-sans text-lg text-sea">·</span>
-            <span className="text-ink-muted">
-              Mix shapes freely. Softness 0 = crisp. Gear = letter guide, grid guide, corners.
-              The Paint letter strip keeps a whole set in one session.
-            </span>
-          </li>
-        </ol>
-        <div className="rise rise-4 mt-auto space-y-2 pt-8 safe-pb">
-          <Button
-            variant="accent"
-            size="lg"
-            className="w-full lg:max-w-sm"
-            data-testid="intro-start"
-            onClick={onStart}
-          >
-            Start workshop
-          </Button>
-          <p className="text-center font-sans text-[11px] text-ink-muted">
-            Takes about a minute to make your first glyph.
-          </p>
-        </div>
-      </div>
-    </div>
-  )
+function IntroScreen({ onStart }: { onStart: (page:Screen) => void }) {
+  return <main className="tool-home" data-testid="intro-screen">
+    <header><p className="home-kicker">Beckmans Type Design Tool</p><h1>Make letters.<br/>Make them yours.</h1><p className="home-description">A simple tool for drawing letters from shapes. Choose a shape, draw on a grid, and turn your letters into a font.</p></header>
+    <nav className="home-pages" aria-label="Tool pages">
+      {([{id:'shape',number:'01',title:'Shape',description:'Choose the shapes you want to draw with.'},{id:'paint',number:'02',title:'Paint',description:'Draw letters and symbols. Adjust their size, corners and connections.'},{id:'export',number:'03',title:'Export',description:'Preview your lettering. Download SVG drawings or a font you can install.'}] as const).map(page=><button key={page.id} onClick={()=>onStart(page.id)} className="home-page"><span className="home-page-number">{page.number}</span><strong>{page.title}<span aria-hidden="true"> →</span></strong><span>{page.description}</span></button>)}
+    </nav>
+    <section className="home-copy"><h2>Copy it. Change it. Make it better.</h2><p>You can duplicate this project and build your own version. Try new shapes, improve the tools, or share a better way to design letters.</p><a href="https://github.com/Sgdotcom/beckmans-type-design-tool">Get the code on GitHub →</a></section>
+    <footer>Your work is saved in this browser. Download an editable backup to keep a separate copy.</footer>
+  </main>
 }
 
 function ShapePicker({

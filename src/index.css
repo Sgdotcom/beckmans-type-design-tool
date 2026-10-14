@@ -1278,3 +1278,22 @@ body.install-view {
 .character-case button { margin:0; padding:3px; }
 .character-case button[aria-pressed=true] { background:#000; color:#fff; border-color:#000; }
 .character-progress { margin:6px 0; font-size:10px; color:#666; }
+
+.tool-home { flex:1; min-height:0; overflow:auto; background:#fff; color:#111; padding:clamp(24px,5vw,64px); }
+.tool-home > * { max-width:960px; margin-left:auto; margin-right:auto; }
+.home-kicker { color:#0000ee; font-size:12px; margin:0 0 28px; }
+.tool-home h1 { font-size:clamp(38px,6vw,76px); line-height:1.02; letter-spacing:-.04em; font-weight:700; margin:0 0 24px; }
+.home-description { font-size:clamp(16px,2vw,20px); max-width:600px; line-height:1.5; color:#555; margin-bottom:36px; }
+.home-pages { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.home-page { text-align:left; display:flex; flex-direction:column; gap:14px; padding:20px; border:1px solid #ccc; background:#fafafa; min-width:0; }
+.home-page:hover { border-color:#0000ee; background:#fff; }
+.home-page-number { font-size:11px; color:#777; }
+.home-page strong { display:flex; justify-content:space-between; font-size:22px; }
+.home-page strong span { color:#0000ee; }
+.home-page > span:last-child { font-size:13px; line-height:1.5; color:#555; }
+.home-copy { border-top:1px solid #ddd; margin-top:36px; padding-top:24px; }
+.home-copy h2 { font-size:20px; font-weight:600; margin:0 0 12px; }
+.home-copy p { color:#555; font-size:14px; line-height:1.6; max-width:660px; margin-bottom:14px; }
+.home-copy a { display:inline-block; min-height:36px; font-size:14px; }
+.tool-home footer { font-size:11px; color:#777; margin-top:28px; line-height:1.6; }
+@media(max-width:600px) { .home-pages { grid-template-columns:1fr; } .home-page { gap:8px; padding:16px; } }

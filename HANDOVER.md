@@ -275,3 +275,5 @@ Final repeated regression pass after Workshop parity: resize/history/resume, 144
 Live character discovery update: ABC/abc/Both filters, unfinished-only toggle, remaining/submitted counts and unfinished uppercase-first ordering in desks and Workshop. No glyph/room changes. Browser verified uppercase unfinished filtering leaves active drawing unchanged; SSR discovery, resize/resume and visitor tests passed. Existing open browsers require one manual reload after finishing a stroke; this release does not force reload.
 
 Cloudflare workers.dev endpoint disabled with workers_dev=false; Durable Object data retained for recovery. New app requires no cloud service. Archive files independently validated and copied byte-for-byte to both requested folders. Live new URL verified blank (0 cells), no shared links or console errors.
+
+Homepage update: simple introduction, Shape/Paint/Export launch cards, code-copy/improvement invitation and repository link. Homepage shown on entry; editor name is a Home button. Existing project persists across all navigation. Browser verified all three routes and 15-cell existing drawing preserved. Build/local-only checks passed.
