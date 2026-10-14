@@ -10,7 +10,7 @@ live.pushSession({});assert.equal(requests,0)
 const {FESTIVAL_KEY,parseSession}=await j.import('../src/lib/festival.ts')
 assert.equal(FESTIVAL_KEY,'beckmans-type-design-project-v1')
 const {PRESET_SHAPES}=await j.import('../src/lib/types.ts')
-const fixture={version:2,updatedAt:'2026-10-14T00:00:00Z',active:{char:'A',grid:{cols:7,rows:9,cellSize:40,gap:2},filled:[],brokenJoins:[],softness:0,cornerRadius:0,holeMode:'open'},drafts:[],contributions:[],library:PRESET_SHAPES}
+const fixture={version:2,updatedAt:'2026-10-14T00:00:00Z',active:{char:'A',grid:{cols:7,rows:9,cellSize:40,gap:2},filled:[],brokenJoins:[],softness:0,cornerRadius:0,holeMode:'open'},drafts:[],contributions:[],library:PRESET_SHAPES,liveSvg:''}
 assert.equal(parseSession(JSON.stringify(fixture)).active.char,'A')
 const app=readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8'),main=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8')
 assert.ok(!main.includes('StudioDesk') && !main.includes('Projection'))
