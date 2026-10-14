@@ -1,3 +1,13 @@
+# Beckmans Type Design Tool — single-user release, 14 October 2026
+
+Current app: one local editor; no shared room, station or projection routes. `useLocalSession` never starts network sync. Fresh storage keys begin beckmans-type-design; old festival local data is left untouched for recovery. Export page includes all nonempty drafts/current drawing as well as saved characters. GitHub Pages base derives renamed repo beckmans-type-design-tool.
+
+Festival source preserved in archive/festival, Git tag festival-shared-archive-2026-10-14, and separate source ZIP. Cloud session snapshot: 53 submissions/55 drafts; generated complete OTF, WOFF and SVG contain 55 nonempty characters. Editable JSON and raw snapshot saved to Downloads and Desktop/VK FESTIVALEN. Cloud data retained for recovery, not loaded by the new app. Five historic archives remain password-protected in Cloudflare; only their index was downloaded.
+
+Build, local-only regression, recovery/data, font design, specimen and character discovery passed. Browser: starter 15 cells, Undo 0, Redo/reload 15, no shared controls, local OTF save link, no console errors. FontTools independently compared all 55 OTF/WOFF outlines/advances and SVG parsed.
+
+## Previous festival handover
+
 # Grid workshop — handover (9 October 2026)
 
 For a colleague reviewing **welding / Softness** and related app work with Claude Code. Start with [`CLAUDE.md`](CLAUDE.md); this file is the full status.

@@ -1,0 +1,22 @@
+import {createJiti} from 'jiti'
+import {readFileSync,writeFileSync} from 'node:fs'
+const j=createJiti(import.meta.url,{alias:{'@':new URL('../src',import.meta.url).pathname}})
+const {PRESET_SHAPES}=await j.import('../src/lib/types.ts')
+const {parseSession}=await j.import('../src/lib/festival.ts')
+const {buildSvgMarkup,buildSetSvgMarkup}=await j.import('../src/lib/export.ts')
+const {buildFestivalFont,toWoff}=await j.import('../src/lib/fontExport.ts')
+const out=new URL('../../../outputs/',import.meta.url),room=JSON.parse(readFileSync(new URL('boom-session-2026-10-14.json',out)))
+const latest=new Map()
+for(const c of room.contributions)if(c.draft.filled.length)latest.set(c.draft.char,c.draft)
+for(const d of room.drafts)if(d.filled.length)latest.set(d.char,d)
+const drafts=[...latest.values()],payload=d=>({grid:d.grid,library:PRESET_SHAPES,filledRegions:d.filled,glyphChar:d.char,softness:d.softness,cornerRadius:d.cornerRadius,holeMode:d.holeMode,fontDesign:d.fontDesign,brokenJoins:new Set(d.brokenJoins)})
+const project={version:2,updatedAt:room.updatedAt,active:drafts[0],drafts,contributions:room.contributions,library:PRESET_SHAPES,customSymbols:room.customSymbols??[],draftUpdatedAt:room.draftUpdatedAt,liveSvg:''}
+parseSession(JSON.stringify(project))
+writeFileSync(new URL('Beckmans-Festival-Complete-2026-10-14.json',out),JSON.stringify(project,null,2))
+const contributions=drafts.map(draft=>({id:draft.char,createdAt:room.updatedAt,draft,svg:''}))
+const font=buildFestivalFont(contributions,PRESET_SHAPES,{fontName:'Beckmans Festival Complete',proportional:false}),buf=font.toArrayBuffer()
+writeFileSync(new URL('Beckmans-Festival-Complete-2026-10-14.otf',out),new Uint8Array(buf))
+writeFileSync(new URL('Beckmans-Festival-Complete-2026-10-14.woff',out),new Uint8Array(toWoff(buf)))
+writeFileSync(new URL('Beckmans-Festival-Complete-2026-10-14.svg',out),buildSetSvgMarkup(drafts.map(payload)))
+writeFileSync(new URL('Beckmans-Festival-Archive-README.txt',out),`Festival snapshot ${room.updatedAt}\n${room.contributions.length} submissions and ${room.drafts.length} saved drafts.\nComplete font and SVG contain ${drafts.length} nonempty characters. Latest nonempty saved drafts take precedence over submitted versions. Raw room JSON preserves every submission and all saved drafts. Editable project can be restored in the design tool. OTF and WOFF are static vector fonts.\n`)
+console.log({submitted:room.contributions.length,savedDrafts:room.drafts.length,exportedCharacters:drafts.length,otfBytes:buf.byteLength})

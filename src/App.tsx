@@ -69,16 +69,13 @@ import { cn } from '@/lib/utils'
 import { downloadBlob } from '@/lib/utils'
 import { prefBoolean, prefNumber, readUiPrefs, writeUiPrefs } from '@/lib/uiPrefs'
 import { ALPHABET, FESTIVAL_KEY, latestContributions, parseSession, readSession, type Contribution, type FestivalSession } from '@/lib/festival'
-import { ClearRoomControl } from '@/components/ClearRoomControl'
-import { LiveSessionJoin } from '@/components/LiveSessionJoin'
-import { SessionArchives } from '@/components/SessionArchives'
 import {
   letterUnchanged,
   mergeContributions,
   planRemoteDeskApply,
   type LetterClockBase,
 } from '@/lib/liveSession'
-import { useLiveSession } from '@/lib/useLiveSession'
+import { useLocalSession as useLiveSession } from '@/lib/useLocalSession'
 
 type Screen = 'shape' | 'paint' | 'export'
 type ExportStatus =
@@ -187,7 +184,7 @@ export default function App() {
   const [glyphs, setGlyphs] = useState<Map<string, GlyphDraft>>(() => new Map(restored?.drafts.map(draft => [draft.char, draft]) ?? []))
   const [contributions, setContributions] = useState<Contribution[]>(restored?.contributions ?? [])
   const [saveStatus, setSaveStatus] = useState(recovery.error || 'Ready')
-  const [notice, setNotice] = useState('Choose a letter, draw, then add it to the typeface.')
+  const [notice, setNotice] = useState('Choose a character and draw. Your work is saved locally.')
   const settingsRef = useRef({ grid, softness, cornerRadius, holeMode, fontDesign })
   settingsRef.current = { grid, softness, cornerRadius, holeMode, fontDesign }
   const sessionRef = useRef<FestivalSession | null>(restored)
@@ -695,6 +692,12 @@ export default function App() {
     live.liveRoom?.contributions ?? [],
   )
   const publishedTypeface = latestContributions(typefaceContributions)
+  // A personal font includes work in progress, without needing a festival submission.
+  const exportDrafts = new Map([...publishedTypeface.values()].map(c=>[c.draft.char,c.draft]))
+  for(const draft of glyphs.values()) if(draft.filled.length) exportDrafts.set(draft.char,draft)
+  if(activeDraft.filled.length) exportDrafts.set(activeDraft.char,activeDraft)
+  const exportCharacters=[...exportDrafts.values()].map(draft=>({id:draft.char,createdAt:'',draft,svg:''}))
+
 
   const backupSession = () => {
     if (recovery.error) {
@@ -1059,7 +1062,7 @@ export default function App() {
         <header className="safe-pt relative z-50 flex shrink-0 items-center justify-between gap-2 border-b border-ink/10 px-3 pb-2 pt-2 lg:px-5 lg:pb-3 lg:pt-3">
           <div className="min-w-0">
             <p className="specimen-rule mb-0.5">
-              grid workshop
+              Beckmans Type Design Tool
             </p>
             <h1 className="truncate font-sans text-[1.35rem] font-bold leading-none text-ink">
               {TABS.find((t) => t.id === screen)?.label}
@@ -1080,20 +1083,6 @@ export default function App() {
         <div className={cn('festival-toolbar', screen === 'paint' && 'is-paint')}>
           <span role="status" className={cn('festival-save', saveFailed && 'is-error')}>{saveStatus}</span>
           <span role="status" className="festival-notice">{notice}</span>
-          <span className="festival-links">
-            <span className="festival-room-group" aria-label={`Room ${live.room}`}>
-              <strong>{live.room}</strong>
-              <a href={`?view=projection&room=${encodeURIComponent(live.room)}`} onClick={() => writeSession(false)}>
-                Projection →
-              </a>
-              <a href={`?view=studio&station=a&room=${encodeURIComponent(live.room)}`} onClick={() => writeSession(false)}>
-                Desk A →
-              </a>
-              <a href={`?view=studio&station=b&room=${encodeURIComponent(live.room)}`} onClick={() => writeSession(false)}>
-                Desk B →
-              </a>
-            </span>
-          </span>
           <input ref={importRef} type="file" accept="application/json,.json" hidden onChange={event => {
             const file = event.target.files?.[0]
             if (file) void restoreSession(file)
@@ -1199,7 +1188,7 @@ export default function App() {
               <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               <div className="festival-contribute">
                 <p role="status">{notice}</p>
-                <button type="button" data-testid="publish-glyph" disabled={!filled.size || publishing} onClick={publishGlyph}>Add {displayGlyphName} to the typeface</button>
+                <button type="button" data-testid="publish-glyph" disabled={!filled.size || publishing} onClick={publishGlyph}>Save {displayGlyphName}</button>
                 <button type="button" data-testid="next-visitor" onClick={() => {
                   // A new visitor starts with plain tools, whatever the last one left on.
                   setPaintTool('stamp')
@@ -1210,9 +1199,9 @@ export default function App() {
                   const next = nextEmptyLetter(displayGuideLetter, guideUpper, typefaceContributions, [...glyphsRef.current.values(), ...(live.liveRoom?.drafts ?? [])],symbolsRef.current)
                   if (next) {
                     switchToLetter(next, guideUpper)
-                    setNotice(`Your letter is ${guideUpper ? next.toUpperCase() : next}. Draw it, then add it to the typeface.`)
+                    setNotice(`Your letter is ${guideUpper ? next.toUpperCase() : next}. Draw it; your work is saved locally.`)
                   } else setNotice('Every letter has a contribution. Choose one to create another version.')
-                }}>Next visitor →</button>
+                }}>Next character →</button>
               </div>
               <div className="relative z-20 flex shrink-0 items-center gap-1.5 border-b border-ink/10 px-2 py-1.5 lg:px-4 overflow-x-auto">
                 <ToolIcon label="Undo" disabled={!canUndo} onClick={undo} icon={<Undo2 className="h-4 w-4" />} />
@@ -1796,31 +1785,31 @@ export default function App() {
               {designTools}
               {characterTools}
               <section className="festival-versions" data-testid="festival-collection">
-                <h2>The festival collection · {publishedTypeface.size} letters</h2>
+                <h2>Drawn characters · {exportCharacters.length}</h2>
                 <p>
-                  Every submission is kept in the shared room. Clear letter only empties the canvas —
-                  published letters stay on the wall and here for export.
+                  Saved characters stay in your local project. Clear letter only empties the canvas —
+                  saved versions remain available for export.
                 </p>
                 <Button
                   data-testid="export-typeface-svg"
-                  disabled={!typefaceContributions.length}
+                  disabled={!exportCharacters.length}
                   onClick={() => {
-                  const payloads = [...publishedTypeface.values()].map(({ draft }) => ({
+                  const payloads = exportCharacters.map(({ draft }) => ({
                     grid: draft.grid!, library, filledRegions: draft.filled, glyphChar: draft.char,
                     softness: draft.softness!, cornerRadius: draft.cornerRadius, fontDesign:draft.fontDesign,
                     brokenJoins: new Set(draft.brokenJoins),
                     holeMode: draft.holeMode,
                   }))
                   exportGlyphSet(payloads)
-                }}>Download published typeface (SVG)</Button>
+                }}>Download alphabet (SVG)</Button>
                 <Button
                   data-testid="export-typeface-otf"
-                  disabled={!typefaceContributions.length}
+                  disabled={!exportCharacters.length}
                   onClick={async () => {
                   try {
                     const { exportFestivalFont } = await import('@/lib/fontExport')
-                    await exportFestivalFont([...publishedTypeface.values()], library)
-                    setNotice('Your installable festival font has downloaded.')
+                    await exportFestivalFont(exportCharacters, library)
+                    setNotice('Your font has downloaded.')
                   } catch (error) {
                     setNotice(error instanceof Error ? error.message : 'Font export failed.')
                   }
@@ -1972,39 +1961,16 @@ export default function App() {
                   <p className={cn('mb-2 text-[11px] leading-relaxed', saveFailed ? 'font-bold text-[#c00000]' : 'text-ink-muted')}>
                     {saveStatus}
                   </p>
-                  <LiveSessionJoin
-                    className="mb-3"
-                    room={live.room}
-                    enabled={live.enabled}
-                    joined={live.joined}
-                    statusMessage={live.status.message}
-                    onJoin={live.joinSession}
-                  />
+                  <p className="mb-3 text-xs text-ink-muted">Your project stays in this browser. Download a backup to keep a separate copy.</p>
                   <div className="grid grid-cols-2 gap-2">
-                    <a className="options-link" href={`?view=projection&room=${encodeURIComponent(live.room)}`} onClick={() => writeSession(false)}>Projection →</a>
-                    <a className="options-link" href={`?view=join-lab&room=${encodeURIComponent(live.room)}`} onClick={() => writeSession(false)}>Shape joins →</a>
-                    <button type="button" className="options-link" onClick={() => void live.copyWallLink('projection')}>Copy projection link</button>
                     <button type="button" className="options-link" onClick={backupSession}>Editable backup</button>
                     <button type="button" className="options-link" onClick={() => importRef.current?.click()}>Restore backup</button>
-                    <ClearRoomControl
-                      className="col-span-2"
-                      buttonClassName="options-link"
-                      enabled={live.enabled}
-                      onClear={live.clearRoom}
-                    />
+                    <button type="button" className="options-link" onClick={()=>{if(window.confirm('Start a blank project? Download an editable backup first if you want to keep this project.')){localStorage.removeItem(FESTIVAL_KEY);window.location.reload()}}}>New project</button>
                     {recovery.error && (
                       <button type="button" data-testid="start-fresh" className="options-link col-span-2" onClick={startFresh}>
                         Save the unreadable session and start fresh
                       </button>
                     )}
-                  </div>
-                  <div className="mt-4">
-                    <SectionTitle>Previous sessions</SectionTitle>
-                    <SessionArchives
-                      enabled={live.enabled && live.joined}
-                      fetchArchives={live.fetchArchives}
-                      onRestore={live.restoreArchive}
-                    />
                   </div>
                   <p className="mt-2 hidden text-[11px] leading-relaxed text-ink-muted lg:block">
                     Keys: R rotate · C punch-out · E erase · M mirror · G guide · arrows nudge · ⌘/Ctrl+Z undo · ⇧⌘Z redo.
@@ -2166,7 +2132,7 @@ function IntroScreen({ onStart }: { onStart: () => void }) {
     >
       <div className="safe-pt relative mx-auto flex min-h-0 flex-1 flex-col px-5 pb-4 pt-8 lg:max-w-2xl lg:justify-center lg:px-10 lg:pt-16">
         <p className="specimen-rule rise">
-          grid workshop
+          Beckmans Type Design Tool
         </p>
         <h1 className="rise rise-1 mt-5 font-sans text-[2.1rem] font-bold leading-[1.05] text-ink lg:text-4xl">
           Make your letters.

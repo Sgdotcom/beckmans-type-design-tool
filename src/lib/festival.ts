@@ -2,7 +2,7 @@ import { DEFAULT_SPECIMEN, validateSpecimen, type SpecimenSettings } from './spe
 import { DEFAULT_FONT_DESIGN, DIGITS, PUNCTUATION, validCharacter, STANDARD_CHARACTERS, type CustomSymbol } from './fontDesign'
 import { type GlyphDraft, type GridConfig, type ShapeDef, reconcileLibrary, PRESET_SHAPES } from './types'
 
-export const FESTIVAL_KEY = 'grid-workshop-festival-v1'
+export const FESTIVAL_KEY = 'beckmans-type-design-project-v1'
 export const ALPHABET = 'abcdefghijklmnopqrstuvwxyzåäö'.split('')
 
 /** Next untouched letter, wrapping once and preserving upper/lowercase choice. */

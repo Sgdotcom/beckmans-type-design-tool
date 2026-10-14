@@ -1,3 +1,7 @@
+# Beckmans Type Design Tool
+
+Current default is a single-person local editor. Read HANDOVER.md for the conversion and verification. Shared desks, projection, live hook and Cloudflare deployment code are archived under archive/festival and Git tag festival-shared-archive-2026-10-14. Do not restore cloud connections into the active app. Preserve the shared paint/export geometry and old backups.
+
 # Grid workshop — context for Claude Code
 
 Modular letter-design workshop (Beckmans festival). Visitors stamp shapes on a grid, Softness melts neighbours into one silhouette, letters are added to a shared typeface, and a wall projection shows the alphabet. Schema v2 projects read v1 backups; glyph design settings and custom-symbol metadata are described in `HANDOVER.md`. Session is `localStorage` plus an optional Cloudflare Worker live room (`VITE_LIVE_SESSION_URL`).

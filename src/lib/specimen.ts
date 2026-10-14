@@ -10,7 +10,7 @@ export interface SpecimenSettings {
     proportional: boolean;
     fontName: string;
 }
-export const DEFAULT_SPECIMEN: SpecimenSettings = { size: 72, tracking: 0, leading: 1.35, ink: '#000000', paper: '#ffffff', proportional: false, fontName: 'Beckmans Together' };
+export const DEFAULT_SPECIMEN: SpecimenSettings = { size: 72, tracking: 0, leading: 1.35, ink: '#000000', paper: '#ffffff', proportional: false, fontName: 'Beckmans Type Design' };
 export interface GlyphMetrics {
     scale: number;
     left: number;

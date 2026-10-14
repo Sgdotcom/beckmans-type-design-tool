@@ -3,7 +3,7 @@
  * brush, guides, preview toggles. Stored apart from the festival session so a
  * restored backup never changes how the editor is set up.
  */
-export const UI_PREFS_KEY = 'grid-workshop-ui-v1'
+export const UI_PREFS_KEY = 'beckmans-type-design-ui-v1'
 
 export interface UiPrefs {
   shapeId: string
